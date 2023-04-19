@@ -8,5 +8,16 @@ class HomeRepository implements IHomeRepository {
   const HomeRepository(this._dataProvider);
 
   @override
-  Future<List<PostModel>?> getItems() => _dataProvider.getItems();
+  Future<List<PostModel>> getItems() => _dataProvider.getItems();
+
+  @override
+  Future<bool> insertItem(PostModel model) async {
+    try {
+      await _dataProvider.insertItem(model);
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

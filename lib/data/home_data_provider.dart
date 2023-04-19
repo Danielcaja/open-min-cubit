@@ -9,12 +9,19 @@ class HomeDataProvider implements IHomeDataProvider {
 
   const HomeDataProvider(this._dio);
 
+  static const path = '/posts';
+
   @override
   Future<List<PostModel>> getItems() async {
     debugPrint('Getting');
-    final result = await _dio.get<List<dynamic>>('/posts');
+    final result = await _dio.get<List<dynamic>>(path);
 
     debugPrint('Getted');
     return result.data!.map((e) => PostModel.fromMap(e)).toList();
+  }
+
+  @override
+  Future<void> insertItem(PostModel model) async {
+    await _dio.post(path, data: model.toMap());
   }
 }

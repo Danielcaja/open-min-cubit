@@ -18,16 +18,10 @@ class ErrorLoadingPostsState extends HomeStates {
   const ErrorLoadingPostsState();
 }
 
-abstract class InsertingResultState extends HomeStates {
+class InsertingResultState extends LoadedPostsState {
   final String message;
+  final bool successed;
 
-  const InsertingResultState(this.message);
-}
-
-class ErrorInsertingPostsState extends InsertingResultState {
-  ErrorInsertingPostsState(super.message);
-}
-
-class SuccessInsertingPostsState extends InsertingResultState {
-  SuccessInsertingPostsState(super.message);
+  InsertingResultState(List<PostModel> items, this.successed, this.message)
+      : super(items);
 }

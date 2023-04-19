@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../data/home_data_provider.dart';
 import '../domain/home_repository.dart';
-import '../post_model.dart';
 import 'cubit/cubit.dart';
 import 'cubit/states.dart';
 
@@ -33,12 +32,19 @@ class _HomePageState extends State<HomePage> {
     repository = HomeRepository(dataProvider);
     cubit = HomeCubit(repository);
     super.initState();
+
+    cubit.stream.listen((state) {
+      if (state is InsertingResultState) {
+        if (state.successed) {
+          AsukaSnackbar.success(state.message).show();
+        } else {
+          AsukaSnackbar.alert(state.message).show();
+        }
+      }
+    });
   }
 
   insertItems() {
-    final titleController = TextEditingController();
-    final bodyController = TextEditingController();
-
     Asuka.showModalBottomSheet(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -51,12 +57,12 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             TextField(
-              controller: titleController,
+              controller: cubit.titleController,
               decoration: const InputDecoration(hintText: 'Título'),
             ),
             const SizedBox(height: 30),
             TextField(
-              controller: bodyController,
+              controller: cubit.bodyController,
               decoration: const InputDecoration(hintText: 'Conteúdo'),
               maxLines: 5,
             ),
@@ -65,19 +71,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () async {
                 Navigator.pop(context);
 
-                final model = PostModel(
-                  userId: 1,
-                  title: titleController.text,
-                  body: bodyController.text,
-                );
-
-                try {
-                  await dio.post<dynamic>('/posts', data: model.toJson());
-
-                  AsukaSnackbar.success('Sucesso ao enviar!').show();
-                } catch (e) {
-                  AsukaSnackbar.alert('Erro ao enviar!').show();
-                }
+                cubit.insertItem();
               },
               child: const Text('Enviar'),
             )
